@@ -1,0 +1,30 @@
+name: Upload Flutter Project to Google Drive
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create ZIP
+        run: |
+          zip -r flutter-project.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "build/*" \
+            -x ".dart_tool/*"
+
+      - name: Upload to Google Drive
+        uses: adriangl/google-drive-upload@v1
+        with:
+          credentials: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          folderId: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          filename: flutter-project.zip
